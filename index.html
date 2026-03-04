@@ -2,119 +2,71 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-     <link rel="stylesheet" href="styles.css">
-     <meta charset="UTF-8" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Entrenamiento Semanal</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrenamiento Semanal</title>
 </head>
 
 <body>
 
-   <header>
-        <div class="wrap">
-            <h1>Entrenamiento Semanal</h1>
+<header>
+    <div class="wrap">
+        <h1>Entrenamiento Semanal</h1>
 
-            <div class="menu">
-                <span class="menu-item">Inicio</span>
-                <span class="menu-item">Semana</span>
-            </div>
-        </div>
-    </header>
+        <nav class="menu">
+            <span class="menu-item">Inicio</span>
+            <span class="menu-item">Semana</span>
+        </nav>
+    </div>
+</header>
 
-    <main class="contenedor">
+<main class="contenedor">
 
-        <!--Tabla de entrenamiento-->
-        <section class="lista-entrenos">
-            <h2>Plan semanal</h2>
-            <div class="entreno">
-                <span class="dia">Lunes</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+    <section class="lista-entrenos">
+        <h2>Entrenamientos de la semana</h2>
 
-            <div class="entreno">
-                <span class="dia">Martes</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+        <ul class="lista-semanal">
 
-            <div class="entreno">
-                <span class="dia">Miércoles</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+            <li class="entreno">
+                <span>Sentadillas 4x12</span>
+                <span class="alta"></span>
+            </li>
 
-            <div class="entreno">
-                <span class="dia">Jueves</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+            <li class="entreno">
+                <span>Correr 20 minutos</span>
+                <span class="media"></span>
+            </li>
 
-            <div class="entreno">
-                <span class="dia">Viernes</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+            <li class="entreno">
+                <span>Abdominales 3x20</span>
+                <span class="baja"></span>
+            </li>
 
-            <div class="entreno">
-                <span class="dia">Sábado</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+            <li class="entreno">
+                <span>Peso muerto 3x10</span>
+                <span class="alta"></span>
+            </li>
 
-            <div class="entreno">
-                <span class="dia">Domingo</span>
-                <input type="text" placeholder="Horario">
-                <input type="text" placeholder="Rutina">
-                <select class="intensidad">
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-            </div>
+            <li class="entreno">
+                <span>Yoga y estiramientos</span>
+                <span class="baja"></span>
+            </li>
 
-        </section>
+        </ul>
 
-        <aside class="opciones">
-            <h3>Intensidad</h3>
-            <ul>
-                <li>Alta intensidad</li>
-                <li>Media intensidad</li>
-                <li>Baja intensidad</li>
-            </ul>
-        </aside>
+    </section>
 
-    </main>
+    <aside class="opciones">
+        <h3>Intensidad</h3>
+        <ul class="lateral">
+            <li><span class="alta"></span> Alta intensidad</li>
+            <li><span class="media"></span> Media intensidad</li>
+            <li><span class="baja"></span> Baja intensidad</li>
+        </ul>
+    </aside>
+
+</main>
 
 </body>
 </html>
