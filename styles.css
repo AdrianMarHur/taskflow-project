@@ -1,0 +1,150 @@
+
+:root {
+    --color-fondo: #e8eff7;
+    --color-header: #1e40af;
+    --color-superficie: #ffffff;
+    --color-texto: #1e293b;
+    --color-borde: #cbd5e1;
+
+    --alta: #d62828;
+    --media: #f4a261;
+    --baja: #2a9d8f;
+
+    --esp: 16px;
+    --radio: 8px;
+    --fuente: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: var(--fuente);
+    background: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+header {
+    background: var(--color-header);
+    color: #fff;
+    padding: var(--esp);
+}
+
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu {
+  display: flex;
+  gap: 16px;
+}
+
+.menu-item {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #1b2535;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.95rem;
+  color: #e9eef6;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.menu-item:hover {
+  background: #25344a;
+  transform: translateY(-1px);
+}
+
+
+.contenedor {
+    display: flex;
+    gap: var(--esp);
+    padding: var(--esp);
+}
+
+.lista-entrenos {
+    flex: 3;
+    background: var(--color-superficie);
+    padding: var(--esp);
+    border-radius: var(--radio);
+    border: 1px solid var(--color-borde);
+}
+
+.opciones {
+    flex: 1;
+    background: var(--color-superficie);
+    padding: var(--esp);
+    border-radius: var(--radio);
+    border: 1px solid var(--color-borde);
+}
+
+.entreno {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: var(--radio);
+    border: 1px solid var(--color-borde);
+    margin-bottom: 10px;
+    background: var(--color-superficie);
+    transition: background 0.2s ease; /* BONUS */
+}
+
+.entreno:hover {
+    background: #eef3f8;
+}
+
+.entreno .dia {
+    flex: 0 0 110px;
+    font-weight: bold;
+}
+
+.entreno input {
+    flex: 1;
+    padding: 8px;
+    border-radius: var(--radio);
+    border: 1px solid var(--color-borde);
+}
+
+.entreno select {
+    flex: 0.5;
+    padding: 8px;
+    border-radius: var(--radio);
+    border: 1px solid var(--color-borde);
+    color: #fff;
+    font-weight: bold;
+}
+
+.entreno select:has(option:checked[value="alta"]) {
+    background: var(--alta);
+}
+.entreno select:has(option:checked[value="media"]) {
+    background: var(--media);
+}
+.entreno select:has(option:checked[value="baja"]) {
+    background: var(--baja);
+}
+
+
+@media (max-width: 900px) {
+    .contenedor {
+        flex-direction: column;
+    }
+
+   .wrap {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .entreno {
+        flex-wrap: wrap;
+    }
+
+    .entreno input, .entreno select {
+        width: 100%;
+    }
+}
