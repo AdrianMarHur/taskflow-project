@@ -5,15 +5,14 @@
     --color-texto: #1e293b;
     --color-borde: #cbd5e1;
 
-    --alta: #d62828;     /* rojo */
-    --media: #f4a261;    /* naranja */
-    --baja: #2a9d8f;     /* verde */
+    --alta: #d62828;
+    --media: #f4a261;
+    --baja: #2a9d8f;
 
     --esp: 16px;
     --radio: 8px;
     --fuente: Arial, sans-serif;
 }
-
 
 body {
     margin: 0;
@@ -56,13 +55,11 @@ header {
     transform: translateY(-2px);
 }
 
-
 .contenedor {
     display: flex;
     gap: var(--esp);
     padding: var(--esp);
 }
-
 
 .lista-entrenos {
     flex: 3;
@@ -76,8 +73,57 @@ header {
     margin-top: 0;
 }
 
-/* TARJETAS DE ENTRENAMIENTOS */
-.tarjeta,
+/* Buscador */
+.input-buscar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    font-size: 15px;
+}
+
+/* Formulario */
+#form-tarea {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#form-tarea input {
+    flex: 2;
+    padding: 10px;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    font-size: 15px;
+}
+
+#select-intensidad {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--color-borde);
+    background: var(--color-superficie);
+    border-radius: var(--radio);
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+#form-tarea button {
+    padding: 10px 16px;
+    border: none;
+    background: var(--color-header);
+    color: white;
+    border-radius: var(--radio);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#form-tarea button:hover {
+    background: #2a4bd8;
+}
+
+/* Tareas */
 .entreno {
     background: var(--color-superficie);
     border: 1px solid var(--color-borde);
@@ -90,14 +136,12 @@ header {
     transition: background 0.3s ease;
 }
 
-.tarjeta:hover,
 .entreno:hover {
     background: #eef3f8;
 }
 
-.alta,
-.media,
-.baja {
+/* Circulitos */
+.alta, .media, .baja {
     width: 18px;
     height: 18px;
     border-radius: 50%;
@@ -108,7 +152,21 @@ header {
 .media { background: var(--media); }
 .baja { background: var(--baja); }
 
+/* Botón borrar */
+.borrar {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #b11a1a;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
+.borrar:hover {
+    transform: scale(1.2);
+}
+
+/* Columna lateral */
 .opciones {
     flex: 1;
     padding: var(--esp);
@@ -130,7 +188,6 @@ header {
     align-items: center;
     gap: 10px;
 }
-
 
 @media (max-width: 900px) {
     .contenedor {

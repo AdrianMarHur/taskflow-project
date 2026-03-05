@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,35 +24,36 @@
 
     <section class="lista-entrenos">
         <h2>Entrenamientos de la semana</h2>
+        <input 
+            type="text" 
+            id="buscar-tarea"
+            placeholder="Buscar tarea..."
+            class="input-buscar"
+        >
 
-        <ul class="lista-semanal">
+        <section class="agregar-tarea">
+            <h3>Añadir tarea</h3>
 
-            <li class="entreno">
-                <span>Sentadillas 4x12</span>
-                <span class="alta"></span>
-            </li>
+            <form id="form-tarea" autocomplete="off">
+                <input 
+                    type="text"
+                    id="input-tarea"
+                    placeholder="Nueva tarea..."
+                    required
+                >
 
-            <li class="entreno">
-                <span>Correr 20 minutos</span>
-                <span class="media"></span>
-            </li>
+                <select id="select-intensidad" required>
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                </select>
 
-            <li class="entreno">
-                <span>Abdominales 3x20</span>
-                <span class="baja"></span>
-            </li>
+                <button type="submit">Añadir</button>
+            </form>
+        </section>
 
-            <li class="entreno">
-                <span>Peso muerto 3x10</span>
-                <span class="alta"></span>
-            </li>
-
-            <li class="entreno">
-                <span>Yoga y estiramientos</span>
-                <span class="baja"></span>
-            </li>
-
-        </ul>
+        <!--Lista modificable -->
+        <ul class="lista-semanal"></ul>
 
     </section>
 
@@ -67,6 +67,8 @@
     </aside>
 
 </main>
+
+<script src="app.js"></script>
 
 </body>
 </html>
