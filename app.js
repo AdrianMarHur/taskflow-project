@@ -82,9 +82,10 @@ function mostrarTarea(tarea) {
 // La clase `sr-only` ya existe en Tailwind y oculta visualmente el texto, pero lo mantiene accesible.
 
 lista.addEventListener("click", (e) => {
-  if (!e.target.classList.contains("borrar")) return;
+  const botonBorrar = e.target.closest(".borrar");
+  if (!botonBorrar) return;
 
-  const li = e.target.closest("li");
+  const li = botonBorrar.closest("li");
   const id = Number(li.dataset.id);
 
   li.remove();
