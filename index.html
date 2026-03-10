@@ -50,7 +50,18 @@
 
             <h2 class="text-xl font-semibold mb-4">Entrenamientos de la semana</h2>
 
+            <!-- Versión original del buscador (comentada):
             <input id="buscar-tarea" type="text" placeholder="Buscar tarea..."
+                class="w-full rounded-lg border border-slate-300 dark:border-slate-600
+                       bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
+                       px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500
+                       transition-colors" />
+            -->
+
+            <!-- Versión mejorada con aria-label activo -->
+            <input id="buscar-tarea" type="text"
+                placeholder="Buscar tarea..."
+                aria-label="Buscar entrenamientos por nombre"
                 class="w-full rounded-lg border border-slate-300 dark:border-slate-600
                        bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
                        px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500
@@ -86,7 +97,21 @@
             </section>
 
             <!-- LISTA -->
+            <!-- Versión original de la lista (comentada):
             <ul class="lista-semanal divide-y divide-slate-300 dark:divide-slate-700"></ul>
+            -->
+
+            <!-- Versión mejorada con aria-live y mensaje vacío activo -->
+            <ul
+                class="lista-semanal divide-y divide-slate-300 dark:divide-slate-700"
+                aria-live="polite"
+                aria-label="Lista de entrenamientos semanales">
+            </ul>
+
+            <p id="mensaje-vacio"
+               class="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                No hay entrenamientos todavía. Añade el primero arriba.
+            </p>
 
         </section>
 

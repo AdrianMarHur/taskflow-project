@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tareas = JSON.parse(guardadas);
     tareas.forEach(mostrarTarea);
   }
+  actualizarEstadoVacio();
 
   const tema = localStorage.getItem("tema");
   if (tema === "dark") {
@@ -52,16 +53,33 @@ function mostrarTarea(tarea) {
     "border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-100 " +
     "dark:hover:bg-slate-700 transition";
 
+  // Versión original del contenido (comentada):
+  // li.innerHTML = `
+  //   <span class="tarea-text">${tarea.texto}</span>
+  //   <div class="flex items-center gap-3">
+  //     <span class="inline-block w-4 h-4 rounded-full ${color}"></span>
+  //     <button class="borrar text-red-500 hover:scale-110 transition" aria-label="Borrar">✖</button>
+  //   </div>
+  // `;
+
+  // Versión mejorada accesible del botón borrar (activa):
   li.innerHTML = `
     <span class="tarea-text">${tarea.texto}</span>
     <div class="flex items-center gap-3">
       <span class="inline-block w-4 h-4 rounded-full ${color}"></span>
-      <button class="borrar text-red-500 hover:scale-110 transition" aria-label="Borrar">✖</button>
+      <button class="borrar text-red-500 hover:scale-110 transition"
+              aria-label="Borrar tarea">
+        <span aria-hidden="true">✖</span>
+        <span class="sr-only">Borrar tarea</span>
+      </button>
     </div>
   `;
 
   lista.appendChild(li);
+  actualizarEstadoVacio();
 }
+
+// La clase `sr-only` ya existe en Tailwind y oculta visualmente el texto, pero lo mantiene accesible.
 
 lista.addEventListener("click", (e) => {
   if (!e.target.classList.contains("borrar")) return;
@@ -72,7 +90,17 @@ lista.addEventListener("click", (e) => {
   li.remove();
   tareas = tareas.filter((t) => t.id !== id);
   guardar();
+  actualizarEstadoVacio();
 });
+
+// Estado vacío + feedback visual (versión activa):
+const mensajeVacio = document.getElementById("mensaje-vacio");
+
+function actualizarEstadoVacio() {
+  if (!mensajeVacio) return;
+  const hayTareas = lista.querySelectorAll("li").length > 0;
+  mensajeVacio.style.display = hayTareas ? "none" : "";
+}
 
 if (buscador) {
   buscador.addEventListener("input", () => {
