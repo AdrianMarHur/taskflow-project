@@ -149,3 +149,89 @@ Ctrl + N — Nuevo archivo
 Ctrl + S — Guardar
 Ctrl + Shift + G — Abrir panel de Git
 Ctrl + Enter — Hacer commit
+
+// SUGERENCIAS DE MEJORA HECHAS POR CURSOR  //
+
+//Mejoras en mi HTML:
+
+<!--
+                SUGERENCIA (ACCESIBILIDAD BUSCADOR):
+                Sustituir el input anterior por este, que añade un aria-label más descriptivo.
+
+                <input id="buscar-tarea" type="text"
+                    placeholder="Buscar tarea..."
+                    aria-label="Buscar entrenamientos por nombre"
+                    class="w-full rounded-lg border border-slate-300 dark:border-slate-600
+                           bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
+                           px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500
+                           transition-colors" />
+            -->
+
+<!--
+                SUGERENCIA (ACCESIBILIDAD LISTA + ESTADO VACÍO):
+                1) Añadir aria-live y aria-label para que los lectores de pantalla anuncien cambios.
+                2) Mostrar un mensaje cuando no haya tareas.
+
+                Reemplazar el <ul> anterior por este:
+
+                <ul
+                    class="lista-semanal divide-y divide-slate-300 dark:divide-slate-700"
+                    aria-live="polite"
+                    aria-label="Lista de entrenamientos semanales">
+                </ul>
+
+                Y añadir, si lo prefieres, un contenedor para mensaje vacío:
+
+                <p id="mensaje-vacio"
+                   class="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                    No hay entrenamientos todavía. Añade el primero arriba.
+                </p>
+            -->
+
+//Mejoras en mi app.js:
+
+// SUGERENCIA (ACCESIBILIDAD BOTÓN BORRAR):
+// Para que el icono ✖ sea accesible y tenga un texto descriptivo visible para lectores de pantalla,
+// puedes sustituir el bloque anterior de li.innerHTML por este:
+//
+//   li.innerHTML = `
+//     <span class="tarea-text">${tarea.texto}</span>
+//     <div class="flex items-center gap-3">
+//       <span class="inline-block w-4 h-4 rounded-full ${color}"></span>
+//       <button class="borrar text-red-500 hover:scale-110 transition"
+//               aria-label="Borrar tarea">
+//         <span aria-hidden="true">✖</span>
+//         <span class="sr-only">Borrar tarea</span>
+//       </button>
+//     </div>
+//   `;
+//
+// La clase `sr-only` ya existe en Tailwind y oculta visualmente el texto, pero lo mantiene accesible.
+
+
+// SUGERENCIA (ESTADO VACÍO + FEEDBACK VISUAL):
+// Si has añadido en el HTML un <p id="mensaje-vacio"> para cuando no haya tareas,
+// podrías controlar su visibilidad así:
+//
+// const mensajeVacio = document.getElementById("mensaje-vacio");
+//
+// function actualizarEstadoVacio() {
+//   if (!mensajeVacio) return;
+//   const hayTareas = lista.querySelectorAll("li").length > 0;
+//   mensajeVacio.style.display = hayTareas ? "none" : "";
+// }
+//
+// Después de mostrar o borrar tareas, llama a actualizarEstadoVacio():
+// - Al cargar las tareas guardadas en DOMContentLoaded, después de tareas.forEach(mostrarTarea);
+// - Al final de mostrarTarea(tarea);
+// - Y al borrar (después de guardar()).
+//
+// Además, si quieres una pequeña animación al añadir tareas,
+// puedes añadir clases de transición y luego limpiarlas, por ejemplo:
+//
+//   li.classList.add("opacity-0", "translate-y-1");
+//   requestAnimationFrame(() => {
+//     li.classList.remove("opacity-0", "translate-y-1");
+//   });
+//
+// añadiendo también en Tailwind las clases necesarias (ya vienen por defecto).
