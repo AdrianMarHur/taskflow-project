@@ -1,145 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Entrenamiento Semanal</title>
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrenamiento Semanal</title>
 
-    <!-- Tailwind conexión -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script> tailwind.config = { darkMode: "class" }; </script>
 
-    <!-- Tailwind config-->
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-        };
-    </script>
+  <!-- Evitar FOUC aplicando tema antes de render -->
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem("tema");
+        const preferDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (stored ? stored === "dark" : preferDark)
+          document.documentElement.classList.add("dark");
+      } catch {}
+    })();
+  </script>
 </head>
 
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
 
-    <!-- HEADER -->
-    <header class="bg-blue-800 dark:bg-slate-800 text-white dark:text-slate-200 py-4 shadow transition-colors duration-300">
-        <div class="max-w-5xl mx-auto px-6 flex items-center justify-between">
+  <!-- HEADER -->
+  <header class="bg-blue-800 dark:bg-slate-800 text-white py-4 shadow">
+    <div class="max-w-5xl mx-auto px-6 flex items-center justify-between">
+      <h1 class="text-2xl font-bold tracking-wide">Entrenamiento Semanal</h1>
 
-            <h1 class="text-2xl font-bold tracking-wide">Entrenamiento Semanal</h1>
+      <nav class="flex gap-3">
+        <span class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Inicio</span>
+        <span class="px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">Semana</span>
+      </nav>
 
-            <nav class="flex gap-3">
-                <span class="px-3 py-1 rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition">Inicio</span>
-                <span class="px-3 py-1 rounded-lg bg-slate-700 text-slate-200 hover:bg-slate-600 transition">Semana</span>
-            </nav>
+      <!-- Botón de tema -->
+      <button id="theme-toggle"
+              class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-xl shadow"
+              aria-label="Cambiar a tema oscuro"
+              aria-pressed="false">
+        <span id="theme-icon">🌙</span>
+      </button>
+    </div>
+  </header>
 
-            <!-- BOTÓN MODO OSCURO (dinámico) -->
-            <button id="toggle-dark"
-                class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white
-                       hover:brightness-105 active:scale-95 transition-all shadow text-xl">
-                <span id="icon-dark">🌙</span>
-            </button>
+  <!-- MAIN -->
+  <main class="max-w-5xl mx-auto px-6 py-6 flex flex-col lg:flex-row gap-4">
 
-        </div>
-    </header>
+    <!-- COLUMNA PRINCIPAL -->
+    <section class="flex-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-4 shadow">
 
-    <!-- MAIN -->
-    <main class="max-w-5xl mx-auto px-6 py-6 flex flex-col lg:flex-row gap-4">
+      <h2 class="text-xl font-semibold mb-4">Entrenamientos de la semana</h2>
 
-        <!-- COLUMNA PRINCIPAL -->
-        <section
-            class="flex-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-4 transition-colors duration-300 shadow">
+      <!-- Buscador -->
+      <input id="task-search"
+             type="text"
+             placeholder="Buscar tarea…"
+             aria-label="Buscar entrenamientos por nombre"
+             class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 mb-4" />
 
-            <h2 class="text-xl font-semibold mb-4">Entrenamientos de la semana</h2>
+      <!-- Formulario de tarea -->
+      <section class="mb-4">
 
-            <!-- Versión original del buscador (comentada):
-            <input id="buscar-tarea" type="text" placeholder="Buscar tarea..."
-                class="w-full rounded-lg border border-slate-300 dark:border-slate-600
-                       bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
-                       px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500
-                       transition-colors" />
-            -->
+        <!-- Resumen de errores -->
+        <div id="form-error-summary"
+             class="hidden mb-3 rounded border border-red-300 bg-red-50 text-red-800 px-3 py-2 text-sm"
+             role="alert"
+             aria-live="polite"></div>
 
-            <!-- Versión mejorada con aria-label activo -->
-            <input id="buscar-tarea" type="text"
-                placeholder="Buscar tarea..."
-                aria-label="Buscar entrenamientos por nombre"
-                class="w-full rounded-lg border border-slate-300 dark:border-slate-600
-                       bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
-                       px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500
-                       transition-colors" />
+        <h3 class="text-lg font-medium mb-3">Añadir tarea</h3>
 
-            <section class="mb-4">
-                <h3 class="text-lg font-medium mb-3">Añadir tarea</h3>
+        <form id="task-form" autocomplete="off"
+              class="grid grid-cols-1 sm:grid-cols-3 gap-3" novalidate>
 
-                <form id="form-tarea" autocomplete="off" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Campo texto -->
+          <div class="sm:col-span-2">
+            <input id="task-input"
+                   type="text"
+                   placeholder="Nueva tarea..."
+                   aria-describedby="task-input-error"
+                   class="w-full rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2" />
+            <p id="task-input-error"
+               class="mt-1 text-sm text-red-600 hidden"></p>
+          </div>
 
-                    <input id="input-tarea" type="text" placeholder="Nueva tarea..." required
-                        class="sm:col-span-2 w-full rounded-lg border border-slate-300 dark:border-slate-600
-                               bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
-                               px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" />
+          <!-- Select intensidad -->
+          <div>
+            <select id="intensity-select"
+                    aria-describedby="intensity-select-error"
+                    class="w-full rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 font-semibold capitalize">
+              <option value="high">Alta</option>
+              <option value="medium">Media</option>
+              <option value="low">Baja</option>
+            </select>
+            <p id="intensity-select-error"
+               class="mt-1 text-sm text-red-600 hidden"></p>
+          </div>
 
-                    <select id="select-intensidad" required
-                        class="w-full rounded-lg border border-slate-300 dark:border-slate-600
-                               bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
-                               px-3 py-2 font-semibold capitalize cursor-pointer transition-colors">
-                        <option value="alta">Alta</option>
-                        <option value="media">Media</option>
-                        <option value="baja">Baja</option>
-                    </select>
+          <!-- Botón añadir -->
+          <button type="submit"
+                  id="task-submit"
+                  class="rounded-lg bg-blue-800 px-4 py-2 text-white hover:bg-blue-700">
+            Añadir
+          </button>
 
-                    <button type="submit"
-                        class="rounded-lg bg-blue-800 dark:bg-blue-600 px-4 py-2 text-white font-medium
-                               hover:bg-blue-700 dark:hover:bg-blue-500 active:scale-95 focus:outline-none
-                               focus:ring-2 focus:ring-blue-500 transition-all shadow">
-                        Añadir
-                    </button>
+        </form>
+      </section>
 
-                </form>
-            </section>
+      <!-- Lista tareas -->
+      <ul class="task-list divide-y divide-slate-300 dark:divide-slate-700"
+          aria-live="polite"></ul>
 
-            <!-- LISTA -->
-            <!-- Versión original de la lista (comentada):
-            <ul class="lista-semanal divide-y divide-slate-300 dark:divide-slate-700"></ul>
-            -->
+      <p id="empty-state"
+         class="mt-3 text-sm text-slate-500 dark:text-slate-400">
+         No hay entrenamientos todavía. Añade el primero arriba.
+      </p>
 
-            <!-- Versión mejorada con aria-live y mensaje vacío activo -->
-            <ul
-                class="lista-semanal divide-y divide-slate-300 dark:divide-slate-700"
-                aria-live="polite"
-                aria-label="Lista de entrenamientos semanales">
-            </ul>
+    </section>
 
-            <p id="mensaje-vacio"
-               class="mt-3 text-sm text-slate-500 dark:text-slate-400">
-                No hay entrenamientos todavía. Añade el primero arriba.
-            </p>
+    <!-- ASIDE -->
+    <aside class="w-full lg:w-64 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded p-4 shadow">
+      <h3 class="text-lg font-medium mb-3">Intensidad</h3>
+      <ul class="grid gap-3">
+        <li class="flex items-center gap-2"><span class="w-4 h-4 rounded-full bg-red-600"></span>Alta</li>
+        <li class="flex items-center gap-2"><span class="w-4 h-4 rounded-full bg-orange-400"></span>Media</li>
+        <li class="flex items-center gap-2"><span class="w-4 h-4 rounded-full bg-teal-500"></span>Baja</li>
+      </ul>
+    </aside>
 
-        </section>
+  </main>
 
-        <!-- COLUMNA LATERAL -->
-        <aside
-            class="w-full lg:w-64 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600
-                       rounded-lg p-4 h-fit transition-colors duration-300 shadow">
+  <p id="live" class="sr-only" aria-live="polite"></p>
 
-            <h3 class="text-lg font-medium mb-3">Intensidad</h3>
-
-            <ul class="grid gap-3">
-                <li class="flex items-center gap-2">
-                    <span class="inline-block w-4 h-4 rounded-full bg-red-600"></span> Alta intensidad
-                </li>
-                <li class="flex items-center gap-2">
-                    <span class="inline-block w-4 h-4 rounded-full bg-orange-400"></span> Media intensidad
-                </li>
-                <li class="flex items-center gap-2">
-                    <span class="inline-block w-4 h-4 rounded-full bg-teal-500"></span> Baja intensidad
-                </li>
-            </ul>
-
-        </aside>
-
-    </main>
-
-    <script src="app.js"></script>
-
+  <script src="app.js"></script>
 </body>
-
 </html>
