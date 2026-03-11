@@ -235,3 +235,60 @@ Ctrl + Enter — Hacer commit
 //   });
 //
 // añadiendo también en Tailwind las clases necesarias (ya vienen por defecto).
+
+
+/* PROCESO DE INSTALACIÓN DE MCP GITHUB DENTRO DE CURSOR */
+/*
+1) Entender la diferencia
+   - Git/Git Bash conectado a GitHub sirve para `commit/push/pull` (control de versiones).
+   - MCP de GitHub en Cursor sirve para que la IA/Agent pueda usar herramientas de GitHub (issues, PRs, leer ficheros del repo, etc.).
+
+2) Crear configuración MCP a nivel de proyecto
+   - Comprobamos si existía `./.cursor/mcp.json` en el proyecto: no existía.
+   - Creamos la carpeta `./.cursor/`.
+   - Creamos el archivo `./.cursor/mcp.json` con este contenido:
+
+   {
+     "mcpServers": {
+       "github": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-github"],
+         "env": {
+           "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+         }
+       }
+     }
+   }
+
+   Nota:
+   - `command: "npx"` implica tener Node.js instalado y `npx` disponible en el PATH.
+   - Usamos `${env:GITHUB_TOKEN}` para no pegar el token en el archivo del proyecto.
+
+3) Crear/definir el token de GitHub
+   - Generamos un token (PAT) en GitHub (Developer settings → Personal access tokens).
+   - Definimos la variable de entorno `GITHUB_TOKEN` en Windows/PowerShell.
+     Ejemplo (solo sesión actual):
+       $env:GITHUB_TOKEN="TU_TOKEN_AQUI"
+   - Si se define como variable permanente del sistema/usuario, es necesario abrir terminal nueva (y reiniciar Cursor) para que se lea.
+
+4) Reiniciar Cursor para cargar el MCP
+   - “Reiniciar” = cerrar Cursor completamente y volverlo a abrir.
+   - Tras reiniciar, Cursor vuelve a leer `.cursor/mcp.json` y registra el servidor MCP.
+
+5) Verificación (consultas de prueba)
+   - Para comprobar que el MCP está operativo, hacemos peticiones que obliguen a usar GitHub:
+     - “Leer el README.md de OWNER/REPO desde GitHub”
+     - “Listar issues/PRs”
+     - “Mostrar el último commit de main”
+   - Si algo falla, revisar:
+     - que `GITHUB_TOKEN` está definido en una terminal nueva
+     - que `npx` funciona (`npx -v`)
+     - reiniciar Cursor tras cambios en entorno o en `mcp.json`
+*/
+ 
+
+ // En procesos reales un mcp de github puede ser muy útil a la hora de revisar el código, generar resúmenes automáticos e incluso detectar posibles problemas.
+
+ Nos permite también ahorrar mucho tiempo buscando aspectos concretos en repositorios de gran tamaño, o en casos que desconozcamos la manera en la que esta organizado el mismo. 
+ 
+ Incluso podríamos tener la opción de usar MCP para actualizar issues directamente, a la vez que generar README.md nuevos y actualizar archivos dentro del repositorio como los package.json//
