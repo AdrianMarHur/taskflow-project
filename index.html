@@ -59,6 +59,28 @@
              aria-label="Buscar entrenamientos por nombre"
              class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 mb-4" />
 
+      <!-- Filtros -->
+      <div class="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtros de tareas">
+        <button type="button"
+                class="task-filter px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900"
+                data-filter="all"
+                aria-pressed="true">
+          Todas
+        </button>
+        <button type="button"
+                class="task-filter px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900"
+                data-filter="active"
+                aria-pressed="false">
+          Pendientes
+        </button>
+        <button type="button"
+                class="task-filter px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900"
+                data-filter="done"
+                aria-pressed="false">
+          Completadas
+        </button>
+      </div>
+
       <!-- Formulario de tarea -->
       <section class="mb-4">
 

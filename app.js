@@ -103,13 +103,14 @@ const safeBadge = (intensity) => BADGE[intensity] ?? BADGE.medium;
 
 /**
  * Crea el elemento <li> que representa una tarea.
- * @param {{id:number, text:string, intensity:string}} task - Datos de la tarea.
+ * @param {{id:number, text:string, intensity:string, completed?:boolean}} task - Datos de la tarea.
  * @returns {HTMLLIElement} - Elemento <li> completamente armado.
  */
-function TaskItem({ id, text, intensity }) {
+function TaskItem({ id, text, intensity, completed = false }) {
   const li = document.createElement("li");
   li.dataset.id = id;
   li.dataset.intensity = intensity;
+  li.dataset.completed = completed ? "true" : "false";
 
   li.className = cx(
     "flex items-center justify-between gap-3 p-3",
@@ -119,7 +120,13 @@ function TaskItem({ id, text, intensity }) {
   );
 
   const left = document.createElement("span");
-  left.className = "inline-flex items-center gap-2";
+  left.className = "inline-flex items-center gap-3";
+
+  const check = document.createElement("input");
+  check.type = "checkbox";
+  check.className = "toggle-complete w-4 h-4 accent-blue-700";
+  check.checked = !!completed;
+  check.setAttribute("aria-label", completed ? "Marcar como pendiente" : "Marcar como completada");
 
   const dot = document.createElement("span");
   dot.className = cx("inline-block w-2.5 h-2.5 rounded-full", safeBadge(intensity));
@@ -127,8 +134,9 @@ function TaskItem({ id, text, intensity }) {
   const spanText = document.createElement("span");
   spanText.className = "task-text";
   spanText.textContent = text;
+  if (completed) spanText.classList.add("line-through", "opacity-70");
 
-  left.append(dot, spanText);
+  left.append(check, dot, spanText);
 
   const delBtn = document.createElement("button");
   delBtn.type = "button";
@@ -165,6 +173,8 @@ const themeIcon         = document.getElementById("theme-icon");
 const state = {
   tasks: [],
   theme: "light",
+  filter: "all", // all | active | done
+  query: "",
 };
 
 /* ============================================================
@@ -310,3 +320,189 @@ function validateMaxTasks(count) {
     ? { ok: false, msg: `Máximo ${RULES.maxTasks} tareas.` }
     : { ok: true };
 }
+
+/* ============================================================
+  Render + acciones (Funcionalidad 1: completar + filtros)
+  ============================================================ */
+
+function setTasks(next) {
+  state.tasks = next;
+  saveTasks();
+  renderList();
+}
+
+function getVisibleTasks() {
+  const q = norm(state.query);
+  return state.tasks.filter((t) => {
+    const matchesQuery = !q || norm(t.text).includes(q);
+    const matchesFilter =
+      state.filter === "all"
+        ? true
+        : state.filter === "active"
+        ? !t.completed
+        : !!t.completed;
+    return matchesQuery && matchesFilter;
+  });
+}
+
+function renderList() {
+  if (!taskList) return;
+  taskList.innerHTML = "";
+  const visible = getVisibleTasks();
+  for (const task of visible) taskList.appendChild(TaskItem(task));
+  updateEmptyState();
+}
+
+function updateEmptyState() {
+  if (!emptyState || !taskList) return;
+  const hasAny = state.tasks.length > 0;
+  const hasVisible = getVisibleTasks().length > 0;
+  emptyState.style.display = hasVisible ? "none" : "";
+  emptyState.textContent = hasAny
+    ? "No hay tareas que coincidan con el filtro/búsqueda."
+    : "No hay entrenamientos todavía. Añade el primero arriba.";
+}
+
+function setFilter(next) {
+  state.filter = next;
+  const buttons = document.querySelectorAll(".task-filter");
+  buttons.forEach((b) => {
+    const active = b.dataset.filter === next;
+    b.setAttribute("aria-pressed", active ? "true" : "false");
+    // estado activo: fondo azul claro y texto azul oscuro (visible en modo claro)
+    b.classList.toggle("bg-blue-100", active);
+    b.classList.toggle("text-blue-900", active);
+    // estado inactivo: vuelve al fondo blanco por defecto
+    b.classList.toggle("bg-white", !active);
+  });
+  renderList();
+}
+
+function toggleCompleteById(id) {
+  const next = state.tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
+  setTasks(next);
+  const t = next.find((x) => x.id === id);
+  if (t) announce(t.completed ? "Tarea marcada como completada." : "Tarea marcada como pendiente.");
+}
+
+function deleteTaskById(id) {
+  const next = state.tasks.filter((t) => t.id !== id);
+  setTasks(next);
+  announce("Tarea eliminada.");
+}
+
+function addTask(text, intensity) {
+  const newTask = {
+    id: Date.now(),
+    text,
+    intensity,
+    completed: false,
+  };
+  setTasks([newTask, ...state.tasks]);
+  announce("Tarea añadida.");
+}
+
+/* ============================================================
+  Eventos + init
+  ============================================================ */
+
+function applyTheme() {
+  const stored = getStoredTheme();
+  const isDark = stored === "dark" || document.documentElement.classList.contains("dark");
+  document.documentElement.classList.toggle("dark", isDark);
+  if (themeIcon) themeIcon.textContent = isDark ? "☀️" : "🌙";
+  if (themeToggle) {
+    themeToggle.setAttribute("aria-pressed", isDark ? "true" : "false");
+    themeToggle.setAttribute("aria-label", isDark ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle("dark");
+  saveTheme(isDark ? "dark" : "light");
+  applyTheme();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyTheme();
+
+  // Cargar tareas (compatibilidad con tareas antiguas sin "completed")
+  const loaded = loadTasks().map((t) => ({ ...t, completed: !!t.completed }));
+  state.tasks = loaded;
+
+  // Estado inicial
+  setFilter("all");
+  renderList();
+
+  // Submit
+  if (taskForm) {
+    taskForm.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      clearFormErrorSummary();
+      clearFieldError(taskInput, taskInputError);
+      clearFieldError(intensitySelect, intensityError);
+
+      const textRes = validateTaskText(taskInput.value, state.tasks);
+      const intRes = validateIntensity(intensitySelect.value);
+      const maxRes = validateMaxTasks(state.tasks.length);
+
+      if (!maxRes.ok) {
+        setFormErrorSummary(maxRes.msg);
+        return;
+      }
+
+      if (!textRes.ok) {
+        setFieldError(taskInput, taskInputError, textRes.msg);
+        setFormErrorSummary("Revisa los campos del formulario.");
+        return;
+      }
+
+      if (!intRes.ok) {
+        setFieldError(intensitySelect, intensityError, intRes.msg);
+        setFormErrorSummary("Revisa los campos del formulario.");
+        return;
+      }
+
+      addTask(textRes.text, intensitySelect.value);
+      taskForm.reset();
+      taskInput.focus();
+    });
+  }
+
+  // Search
+  if (searchInput) {
+    const onInput = debounce(() => {
+      state.query = searchInput.value;
+      renderList();
+    }, 120);
+    searchInput.addEventListener("input", onInput);
+  }
+
+  // Theme
+  if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+
+  // Filtros
+  delegate(document, "click", ".task-filter", (ev, btn) => {
+    ev.preventDefault();
+    setFilter(btn.dataset.filter || "all");
+  });
+
+  // Delegación en lista: borrar y completar
+  if (taskList) {
+    delegate(taskList, "click", ".delete-task", (ev, btn) => {
+      ev.preventDefault();
+      const li = btn.closest("li");
+      const id = li ? Number(li.dataset.id) : NaN;
+      if (!Number.isFinite(id)) return;
+      deleteTaskById(id);
+    });
+
+    // checkbox: usar change para que funcione con teclado y ratón
+    delegate(taskList, "change", ".toggle-complete", (ev, input) => {
+      const li = input.closest("li");
+      const id = li ? Number(li.dataset.id) : NaN;
+      if (!Number.isFinite(id)) return;
+      toggleCompleteById(id);
+    });
+  }
+});
