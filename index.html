@@ -81,6 +81,39 @@
         </button>
       </div>
 
+      <!-- Filtro por intensidad + orden -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        <div>
+          <label for="intensity-filter" class="block text-sm font-medium mb-1">
+            Filtrar por intensidad
+          </label>
+          <select id="intensity-filter"
+                  class="w-full rounded-lg border border-slate-300 dark:border-slate-600
+                         bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
+                         px-3 py-2">
+            <option value="all">Todas</option>
+            <option value="high">Alta</option>
+            <option value="medium">Media</option>
+            <option value="low">Baja</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="sort-tasks" class="block text-sm font-medium mb-1">
+            Ordenar
+          </label>
+          <select id="sort-tasks"
+                  class="w-full rounded-lg border border-slate-300 dark:border-slate-600
+                         bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200
+                         px-3 py-2">
+            <option value="newest">Más nuevas</option>
+            <option value="oldest">Más antiguas</option>
+            <option value="intensity-desc">Intensidad (Alta → Baja)</option>
+            <option value="intensity-asc">Intensidad (Baja → Alta)</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Formulario de tarea -->
       <section class="mb-4">
 

@@ -181,6 +181,8 @@ const taskInputError    = document.getElementById("task-input-error");
 const intensityError    = document.getElementById("intensity-select-error");
 const themeToggle       = document.getElementById("theme-toggle");
 const themeIcon         = document.getElementById("theme-icon");
+const intensityFilterEl = document.getElementById("intensity-filter");
+const sortTasksEl       = document.getElementById("sort-tasks");
 
 /* ============================================================
    State
@@ -189,6 +191,8 @@ const state = {
   tasks: [],
   theme: "light",
   filter: "all", // all | active | done
+  intensityFilter: "all", // all | high | medium | low
+  sort: "newest", // newest | oldest | intensity-desc | intensity-asc
   query: "",
 };
 
@@ -348,16 +352,39 @@ function setTasks(next) {
 
 function getVisibleTasks() {
   const q = norm(state.query);
-  return state.tasks.filter((t) => {
+  const intensityRank = { high: 3, medium: 2, low: 1 };
+
+  const filtered = state.tasks.filter((t) => {
     const matchesQuery = !q || norm(t.text).includes(q);
+    const matchesIntensity =
+      state.intensityFilter === "all" ? true : t.intensity === state.intensityFilter;
     const matchesFilter =
       state.filter === "all"
         ? true
         : state.filter === "active"
         ? !t.completed
         : !!t.completed;
-    return matchesQuery && matchesFilter;
+    return matchesQuery && matchesFilter && matchesIntensity;
   });
+
+  const sorted = [...filtered];
+  switch (state.sort) {
+    case "oldest":
+      sorted.sort((a, b) => a.id - b.id);
+      break;
+    case "intensity-asc":
+      sorted.sort((a, b) => (intensityRank[a.intensity] ?? 0) - (intensityRank[b.intensity] ?? 0));
+      break;
+    case "intensity-desc":
+      sorted.sort((a, b) => (intensityRank[b.intensity] ?? 0) - (intensityRank[a.intensity] ?? 0));
+      break;
+    case "newest":
+    default:
+      sorted.sort((a, b) => b.id - a.id);
+      break;
+  }
+
+  return sorted;
 }
 
 function renderList() {
@@ -447,6 +474,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Estado inicial
   setFilter("all");
+  if (intensityFilterEl) intensityFilterEl.value = state.intensityFilter;
+  if (sortTasksEl) sortTasksEl.value = state.sort;
   renderList();
 
   // Submit
@@ -501,6 +530,20 @@ document.addEventListener("DOMContentLoaded", () => {
     ev.preventDefault();
     setFilter(btn.dataset.filter || "all");
   });
+
+  // Filtro por intensidad + orden
+  if (intensityFilterEl) {
+    intensityFilterEl.addEventListener("change", () => {
+      state.intensityFilter = intensityFilterEl.value || "all";
+      renderList();
+    });
+  }
+  if (sortTasksEl) {
+    sortTasksEl.addEventListener("change", () => {
+      state.sort = sortTasksEl.value || "newest";
+      renderList();
+    });
+  }
 
   // Delegación en lista: borrar y completar
   if (taskList) {
