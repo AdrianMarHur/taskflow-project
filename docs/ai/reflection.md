@@ -1,3 +1,10 @@
 # Reflexión sobre el Uso de IA
 
 En este documento comentaré sobre cómo la IA influye en el desarrollo y mejora de mi proyecto.
+
+En este ejercicio, en el que hemos utilizado la IA para observar su comportamiento y sus maneras de resolver distintos problemas, he podido comprobar que su mayor utilidad reside en tareas concretas y acotadas. Entre ellas destacan la localización de errores, la automatización de partes repetitivas como la generación de comentarios descriptivos, y la realización de pequeños ajustes, como modificar colores en Tailwind o CSS, mejorar textos o incorporar modificaciones puntuales dentro de funciones ya existentes.
+
+Sin embargo, donde la IA ha mostrado mayores limitaciones ha sido al solicitarle modificaciones amplias que implicaban editar varios archivos simultáneamente. En estos casos, el resultado obtenido era frecuentemente distinto a lo pedido, o incluso peor que el código original. Esto quedó especialmente patente al pedirle que reescribiera funciones completas o añadiera otras nuevas: aunque por sí solas estaban correctamente escritas, no encajaban con el resto del código existente.
+En cuanto a los riesgos de depender en exceso de la IA, son significativos. Si en lugar de usarla como herramienta de apoyo delegamos en ella todo el trabajo, perdemos aspectos fundamentales como el criterio propio y la capacidad de aprendizaje. Además, la IA sigue sin ser capaz de replicar la lógica humana para comprender un problema en profundidad y aportar una solución verdaderamente ajustada a las necesidades reales, en lugar de una respuesta genérica que simplemente funciona.
+
+Por todo ello, recomendaría programar sin asistencia en la fase lógica del proyecto: construir una base sólida y bien estructurada, y recurrir a la IA posteriormente para ahorrar tiempo en tareas repetitivas o de menor impacto. Así se puede dedicar más atención a las partes que realmente determinan la calidad del resultado final.
