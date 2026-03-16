@@ -156,11 +156,11 @@ function TaskItem({ id, text, intensity, completed = false }) {
   const delBtn = document.createElement("button");
   delBtn.type = "button";
   delBtn.className = cx(
-    "delete-task px-2 py-1 rounded",
-    "bg-red-600 text-white hover:bg-red-700",
-    "active:scale-95 transition"
+    "delete-task px-2.5 py-2 rounded md",
+    "bg-red-500 text-white hover:bg-red-600",
+    "active: bg-red-700 scale-90 transition"
   );
-  delBtn.textContent = "✖";
+  delBtn.textContent = "X";
   delBtn.setAttribute("aria-label", "Borrar tarea");
 
   actions.append(editBtn, delBtn);
@@ -646,4 +646,18 @@ document.addEventListener("DOMContentLoaded", () => {
       announce("Tarea actualizada.");
     });
   }
+  
+// ===============================
+// BOTÓN: ELIMINAR TODAS LAS TAREAS
+// ===============================
+const deleteAll = document.getElementById("delete-all");
+if (deleteAll) {
+  deleteAll.addEventListener("click", () => {
+    if (!confirm("¿Eliminar TODAS las tareas?")) return;
+
+    setTasks([]);  
+    announce("Todas las tareas han sido eliminadas.");
+  });
+}
+
 });
