@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api/v1/tasks';
+//const API_URL = 'http://localhost:3000/api/v1/tasks';
+const API_URL = 'https://taskflow-project-pi-sage.vercel.app/api/v1/tasks';
 
 export async function getTasks() {
   const res = await fetch(API_URL);
