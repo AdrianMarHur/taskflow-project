@@ -1,5 +1,7 @@
+import { getTasks, createTask, updateTask, deleteTask } from './src/api/client.js';
+
 /**
- * Versión FINAL
+ * Versión FINAL con conexión al servidor Node.js
  * ---------------------------------------------------------
  * Funciones Refactorizadas clave:
  * - mostrarTarea(tarea)            [creación segura + .tarea-text + X roja]
@@ -78,6 +80,31 @@ function debounce(fn, ms = 180) {
 function announce(msg) {
   const live = document.getElementById("live");
   if (live) live.textContent = msg;
+}
+
+/* ============================================================
+   Estados de red
+   ============================================================ */
+
+/**
+ * Activa o desactiva el estado de carga en el botón de submit.
+ * @param {boolean} isLoading
+ */
+function setLoadingState(isLoading) {
+  const btn = document.getElementById('task-submit');
+  if (btn) {
+    btn.disabled = isLoading;
+    btn.textContent = isLoading ? 'Cargando...' : 'Añadir';
+  }
+}
+
+/**
+ * Muestra un error de red en el resumen del formulario.
+ * @param {string} msg
+ */
+function setNetworkError(msg) {
+  setFormErrorSummary(msg);
+  announce(msg);
 }
 
 /* ============================================================
@@ -198,24 +225,8 @@ const state = {
 };
 
 /* ============================================================
-   Storage (load/save)
+   Storage (solo tema, las tareas ya no se guardan en localStorage)
    ============================================================ */
-
-/**
- * Carga tareas desde localStorage.
- * @returns {Array<{id:number,text:string,intensity:string}>}
- */
-function loadTasks() {
-  try { return JSON.parse(localStorage.getItem("tareas")) || []; }
-  catch { return []; }
-}
-
-/**
- * Guarda tareas en localStorage.
- */
-function saveTasks() {
-  try { localStorage.setItem("tareas", JSON.stringify(state.tasks)); } catch {}
-}
 
 /**
  * Obtiene el tema guardado.
@@ -345,9 +356,8 @@ function validateMaxTasks(count) {
   Render + acciones (Funcionalidad 1: completar + filtros)
   ============================================================ */
 
-function setTasks(next) {
+async function setTasks(next) {
   state.tasks = next;
-  saveTasks();
   renderList();
 }
 
@@ -426,28 +436,49 @@ function setFilter(next) {
   renderList();
 }
 
-function toggleCompleteById(id) {
-  const next = state.tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
-  setTasks(next);
-  const t = next.find((x) => x.id === id);
-  if (t) announce(t.completed ? "Tarea marcada como completada." : "Tarea marcada como pendiente.");
+async function toggleCompleteById(id) {
+  const tarea = state.tasks.find(t => t.id === id);
+  if (!tarea) return;
+  try {
+    setLoadingState(true);
+    const updated = await updateTask(id, { ...tarea, completed: !tarea.completed });
+    state.tasks = state.tasks.map(t => t.id === id ? updated : t);
+    renderList();
+    announce(updated.completed ? 'Tarea completada.' : 'Tarea pendiente.');
+  } catch (err) {
+    setNetworkError('No se pudo actualizar la tarea.');
+  } finally {
+    setLoadingState(false);
+  }
 }
 
-function deleteTaskById(id) {
-  const next = state.tasks.filter((t) => t.id !== id);
-  setTasks(next);
-  announce("Tarea eliminada.");
+async function deleteTaskById(id) {
+  try {
+    setLoadingState(true);
+    await deleteTask(id);
+    state.tasks = state.tasks.filter(t => t.id !== id);
+    renderList();
+    announce('Tarea eliminada.');
+  } catch (err) {
+    setNetworkError('No se pudo eliminar la tarea.');
+  } finally {
+    setLoadingState(false);
+  }
 }
 
-function addTask(text, intensity) {
-  const newTask = {
-    id: Date.now(),
-    text,
-    intensity,
-    completed: false,
-  };
-  setTasks([newTask, ...state.tasks]);
-  announce("Tarea añadida.");
+async function addTask(text, intensity) {
+  const newTask = { text, intensity, completed: false };
+  try {
+    setLoadingState(true);
+    const tarea = await createTask(newTask);
+    state.tasks = [tarea, ...state.tasks];
+    renderList();
+    announce('Tarea añadida.');
+  } catch (err) {
+    setNetworkError('No se pudo añadir la tarea. ¿Está el servidor corriendo?');
+  } finally {
+    setLoadingState(false);
+  }
 }
 
 /* ============================================================
@@ -474,15 +505,23 @@ function toggleTheme() {
 document.addEventListener("DOMContentLoaded", () => {
   applyTheme();
 
-  // Cargar tareas (compatibilidad con tareas antiguas sin "completed")
-  const loaded = loadTasks().map((t) => ({ ...t, completed: !!t.completed }));
-  state.tasks = loaded;
-
-  // Estado inicial
-  setFilter("all");
   if (intensityFilterEl) intensityFilterEl.value = state.intensityFilter;
   if (sortTasksEl) sortTasksEl.value = state.sort;
-  renderList();
+
+  // Cargar tareas desde el servidor
+  setLoadingState(true);
+  getTasks()
+    .then(tareas => {
+      state.tasks = tareas.map(t => ({ ...t, completed: !!t.completed }));
+      setFilter('all');
+      renderList();
+    })
+    .catch(() => {
+      setNetworkError('No se pudieron cargar las tareas. ¿Está el servidor corriendo?');
+    })
+    .finally(() => {
+      setLoadingState(false);
+    });
 
   // Submit
   if (taskForm) {
@@ -639,24 +678,35 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const next = state.tasks.map((t) =>
-        t.id === id ? { ...t, text: res.text } : t
-      );
-      setTasks(next);
-      announce("Tarea actualizada.");
+      updateTask(id, { ...current, text: res.text })
+        .then(updated => {
+          state.tasks = state.tasks.map(t => t.id === id ? updated : t);
+          renderList();
+          announce('Tarea actualizada.');
+        })
+        .catch(() => setNetworkError('No se pudo actualizar la tarea.'));
     });
   }
-  
+
 // ===============================
 // BOTÓN: ELIMINAR TODAS LAS TAREAS
 // ===============================
 const deleteAll = document.getElementById("delete-all");
 if (deleteAll) {
-  deleteAll.addEventListener("click", () => {
+  deleteAll.addEventListener("click", async () => {
     if (!confirm("¿Eliminar TODAS las tareas?")) return;
-
-    setTasks([]);  
-    announce("Todas las tareas han sido eliminadas.");
+    try {
+      setLoadingState(true);
+      const ids = state.tasks.map(t => t.id);
+      await Promise.all(ids.map(id => deleteTask(id)));
+      state.tasks = [];
+      renderList();
+      announce("Todas las tareas han sido eliminadas.");
+    } catch {
+      setNetworkError('No se pudieron eliminar todas las tareas.');
+    } finally {
+      setLoadingState(false);
+    }
   });
 }
 

@@ -1,7 +1,7 @@
 Entrenamiento Semanal
 ======================
 
-Aplicación web sencilla para gestionar entrenamientos semanales: añadir tareas, asignar intensidad, marcarlas como completadas, filtrarlas y reordenarlas, todo desde el navegador y con almacenamiento local.
+Aplicación web para gestionar entrenamientos semanales: añadir tareas, asignar intensidad, marcarlas como completadas, filtrarlas y reordenarlas, todo desde el navegador con un servidor Node.js como backend.
 
 ## Características principales
 
@@ -21,8 +21,7 @@ Aplicación web sencilla para gestionar entrenamientos semanales: añadir tareas
   - Buscador por texto en el título de la tarea.
 
 - **Reordenación por drag & drop**
-  - Arrastra y suelta las tareas para cambiar su orden cuando el modo de ordenación es **“Orden manual (arrastrar)”**.
-  - El orden se guarda en el navegador.
+  - Arrastra y suelta las tareas para cambiar su orden cuando el modo de ordenación es **"Orden manual (arrastrar)"**.
 
 - **Modo claro/oscuro**
   - Botón en el header para cambiar de tema.
@@ -32,67 +31,215 @@ Aplicación web sencilla para gestionar entrenamientos semanales: añadir tareas
   - Validación de formularios con mensajes de error claros.
   - Resumen de errores accesible (`aria-live`).
   - Colores e iconografía adaptados a modo claro y oscuro.
-  - Texto legible en todos los estados de los campos.
-
-- **Persistencia local**
-  - Todas las tareas, su estado (intensidad, completadas) y el orden se guardan en `localStorage`.
-  - No necesita backend ni base de datos.
 
 ## Tecnologías usadas
 
 - **HTML5** para la estructura de la página.
 - **CSS con Tailwind (CDN)** para el estilo y el diseño responsivo.
-- **JavaScript** puro (`app.js`) para la lógica de la aplicación y la gestión del estado en el cliente.
+- **JavaScript** puro (`app.js`) para la lógica de la aplicación.
+- **Node.js + Express** para el servidor backend.
+- **fetch API** para la comunicación entre frontend y backend.
+- **Swagger (OpenAPI)** para la documentación interactiva de la API.
 
 ## Estructura del proyecto
+```
+taskflow_project/
+├── index.html           → Página principal
+├── app.js               → Lógica del frontend
+├── styles.css           → Estilos adicionales
+├── src/
+│   └── api/
+│       └── client.js    → Capa de red (fetch al servidor)
+├── docs/
+│   ├── ai/              → Documentación sobre uso de IA
+│   └── backend-api.md   → Documentación sobre herramientas de backend
+└── server/
+    ├── README.md                 → Documentación técnica exhaustiva del backend
+    ├── src/
+    │   ├── index.js              → Punto de entrada del servidor
+    │   ├── config/
+    │   │   ├── env.js            → Carga y validación de variables de entorno
+    │   │   └── swagger.js        → Configuración de Swagger
+    │   ├── services/
+    │   │   └── task.service.js   → Lógica de negocio (array en memoria)
+    │   ├── controllers/
+    │   │   └── task.controller.js → Validación y gestión de peticiones HTTP
+    │   └── routes/
+    │       └── task.routes.js    → Definición de rutas y documentación JSDoc
+    ├── .env                      → Variables de entorno (no subir a GitHub)
+    ├── .gitignore
+    └── package.json
+```
 
-- `index.html`  
-  Página principal de la aplicación (formulario, lista de tareas, filtros, modo oscuro).
+## Arquitectura backend
 
-- `app.js`  
-  Lógica de la aplicación:
-  - Helpers (`cx`, `delegate`, normalización de texto, debounce…).
-  - Componente `TaskItem` para renderizar cada tarea.
-  - Estado (`state`) y funciones de carga/guardado en `localStorage`.
-  - Validaciones de entrada.
-  - Filtros, búsqueda, completado, edición y drag & drop.
+El servidor sigue una **arquitectura por capas**:
+```
+Cliente (navegador)
+      ↓
+  index.js          → monta Express, middlewares y rutas
+      ↓
+task.routes.js      → conecta verbos HTTP con controladores
+      ↓
+task.controller.js  → valida datos y gestiona la petición
+      ↓
+task.service.js     → ejecuta la lógica pura (array en memoria)
+```
 
-- `styles.css`  
-  Estilos adicionales si son necesarios (además de Tailwind).
+### Middlewares
 
-- `docs/ai/`  
-  Documentación sobre el uso de IA y experimentos con prompts (`cursor-workflow.md`, `prompt-engineering.md`, `experiments.md`).
+- **`cors`** — permite que el frontend (puerto 5500) se comunique con el servidor (puerto 3000) sin ser bloqueado por el navegador.
+- **`express.json()`** — parsea automáticamente el body de las peticiones en formato JSON.
+- **Middleware global de errores** — captura cualquier error no controlado. Si el error es `NOT_FOUND` devuelve un 404; para cualquier otro error devuelve un 500 con un mensaje genérico sin filtrar detalles técnicos al exterior.
+
+## API REST
+
+Base URL: `http://localhost:3000/api/v1`
+
+> Para explorar y probar la API de forma interactiva, accede a la documentación Swagger en `http://localhost:3000/api/docs` con el servidor corriendo.
+
+### Endpoints
+
+#### GET /tasks
+Obtiene todas las tareas.
+
+**Respuesta exitosa (200):**
+```json
+[
+  {
+    "id": 1,
+    "text": "Correr 5 km",
+    "intensity": "high",
+    "completed": false
+  }
+]
+```
+
+#### POST /tasks
+Crea una nueva tarea.
+
+**Body:**
+```json
+{
+  "text": "Correr 5 km",
+  "intensity": "high",
+  "completed": false
+}
+```
+
+**Respuesta exitosa (201):**
+```json
+{
+  "id": 1,
+  "text": "Correr 5 km",
+  "intensity": "high",
+  "completed": false
+}
+```
+
+#### PUT /tasks/:id
+Actualiza una tarea existente (texto, intensidad o estado completado).
+
+**Body:**
+```json
+{
+  "text": "Correr 10 km",
+  "intensity": "high",
+  "completed": true
+}
+```
+
+**Respuesta exitosa (200):**
+```json
+{
+  "id": 1,
+  "text": "Correr 10 km",
+  "intensity": "high",
+  "completed": true
+}
+```
+
+#### DELETE /tasks/:id
+Elimina una tarea por ID.
+
+**Respuesta exitosa (204):** sin body.
+
+---
+
+## Errores de la API
+
+### 400 — Datos inválidos
+Se produce al hacer un POST sin el campo `text`.
+
+**Request:**
+```http
+POST /api/v1/tasks
+Content-Type: application/json
+
+{}
+```
+
+**Response:**
+```json
+{
+  "error": "El campo text es obligatorio"
+}
+```
+
+### 404 — Recurso no encontrado
+Se produce al intentar eliminar o actualizar una tarea que no existe.
+
+**Request:**
+```http
+DELETE /api/v1/tasks/999
+```
+
+**Response:**
+```json
+{
+  "error": "Recurso no encontrado"
+}
+```
+
+### 500 — Error interno del servidor
+Se produce cuando el servidor recibe una petición malformada o ocurre un fallo inesperado.
+
+**Request:**
+```http
+POST /api/v1/tasks
+Content-Type: application/json
+
+{ "text": "tarea  ← JSON mal formado
+```
+
+**Response:**
+```json
+{
+  "error": "Error interno del servidor"
+}
+```
+
+---
 
 ## Cómo ejecutar el proyecto
 
-1. Clonar el repositorio o descargar los archivos.
-2. Abrir el archivo `index.html` en un navegador moderno (Chrome, Firefox, Edge…).
-3. No se requiere instalación de dependencias ni servidor: es una **SPA estática**.
+### 1. Arrancar el servidor
+```bash
+cd server
+npm install
+npm run dev
+```
 
-## Uso básico
+El servidor arrancará en `http://localhost:3000`.
+La documentación Swagger estará disponible en `http://localhost:3000/api/docs`.
 
-1. Escribe una tarea en el campo “Nueva tarea…” y elige una intensidad.
-2. Pulsa **“Añadir”**.
-3. Usa:
-   - El **buscador** para encontrar tareas por texto.
-   - Los **filtros** (Todas / Pendientes / Completadas).
-   - El filtro de **intensidad** y el **orden** para ver la lista como prefieras.
-4. Marca tareas como completadas con el checkbox.
-5. Usa **“Editar”** para cambiar el texto de una tarea.
-6. Haz clic en **“✖”** para borrarla.
-7. En el modo “Orden manual (arrastrar)”, arrastra una tarea y suéltala sobre otra para cambiar el orden.
+### 2. Arrancar el frontend
 
-### Ejemplo de uso
+Abre `index.html` con **Live Server** en VS Code. El frontend estará disponible en `http://127.0.0.1:5500`.
 
-Imagina que quieres planificar tu semana de entrenamiento:
+> Es necesario tener el servidor corriendo antes de abrir el frontend, de lo contrario las tareas no cargarán.
 
-- Añades una tarea **“Correr 5 km”** con intensidad **Alta**.
-- Añades **“Sesión de estiramientos”** con intensidad **Baja**.
-- Añades **“Entrenamiento de fuerza”** con intensidad **Media**.
-- Usas el filtro de **intensidad = Alta** para ver solo las sesiones más exigentes.
-- Ordenas por **“Orden manual (arrastrar)”** y colocas primero lo que quieres hacer al principio de la semana.
-- Cuando terminas “Correr 5 km”, marcas la tarea como **completada**.
-- Si decides cambiar “Entrenamiento de fuerza” por “Fuerza tren superior”, pulsas **“Editar”** y actualizas el texto sin perder su intensidad ni su estado.
+> Para documentación técnica detallada del backend consulta `server/README.md`.
 
 ## Notas sobre accesibilidad
 
@@ -100,5 +247,4 @@ Imagina que quieres planificar tu semana de entrenamiento:
   - `aria-live` para anunciar errores de formulario.
   - Etiquetas y descripciones accesibles en botones (borrar, editar, completar).
   - Colores con suficiente contraste en modo claro y oscuro.
-- El objetivo es que la experiencia sea usable también con teclado y lectores de pantalla.
-
+- El objetivo es que la experiencia sea usable con teclado y lectores de pantalla.

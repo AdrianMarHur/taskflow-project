@@ -6,28 +6,39 @@ function obtenerTareas(req, res) {
 }
 
 function crearTarea(req, res) {
-  const { titulo } = req.body;
+  const { text, intensity } = req.body;
 
-  if (!titulo) {
-    return res.status(400).json({ error: 'El título es obligatorio' });
+  if (!text) {
+    return res.status(400).json({ error: 'El campo text es obligatorio' });
+  }
+
+  const intensidades = ['high', 'medium', 'low'];
+  if (intensity && !intensidades.includes(intensity)) {
+    return res.status(400).json({ error: 'Intensidad inválida' });
   }
 
   const tarea = taskService.crearTarea(req.body);
   res.status(201).json(tarea);
 }
 
-function eliminarTarea(req, res) {
+function actualizarTarea(req, res, next) {
   const { id } = req.params;
+  try {
+    const tarea = taskService.actualizarTarea(id, req.body);
+    res.status(200).json(tarea);
+  } catch (error) {
+    next(error);
+  }
+}
 
+function eliminarTarea(req, res, next) {
+  const { id } = req.params;
   try {
     taskService.eliminarTarea(id);
     res.status(204).send();
   } catch (error) {
-    if (error.message === 'NOT_FOUND') {
-      return res.status(404).json({ error: 'Tarea no encontrada' });
-    }
-    res.status(500).json({ error: 'Error interno del servidor' });
+    next(error);
   }
 }
 
-module.exports = { obtenerTareas, crearTarea, eliminarTarea };
+module.exports = { obtenerTareas, crearTarea, actualizarTarea, eliminarTarea };
