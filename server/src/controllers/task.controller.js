@@ -1,6 +1,6 @@
 const taskService = require('../services/task.service');
 
-function obtenerTareas(req, res) {
+async function obtenerTareas(req, res) {
   const tareas = taskService.obtenerTodas();
   res.status(200).json(tareas);
 }

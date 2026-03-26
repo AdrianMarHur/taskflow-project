@@ -92,9 +92,14 @@ function announce(msg) {
  */
 function setLoadingState(isLoading) {
   const btn = document.getElementById('task-submit');
+  const loadingMsg = document.getElementById('loading-state');
+  
   if (btn) {
     btn.disabled = isLoading;
     btn.textContent = isLoading ? 'Cargando...' : 'Añadir';
+  }
+  if (loadingMsg) {
+    loadingMsg.classList.toggle('hidden', !isLoading);
   }
 }
 

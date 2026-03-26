@@ -162,21 +162,21 @@ Desde ahí puedes ver y probar todos los endpoints directamente desde el navegad
 ## Dependencias
 
 ### Producción
-| Paquete | Versión | Uso |
+| Paquete   | Versión | Uso |
 |---|---|---|
 | `express` | 5.2.1 | Framework HTTP |
-| `cors` | 2.8.6 | Middleware CORS |
-| `dotenv` | 17.3.1 | Carga de variables de entorno |
+| `cors`    | 2.8.6 | Middleware CORS |
+| `dotenv`  | 17.3.1 | Carga de variables de entorno |
 | `swagger-jsdoc` | 6.2.8 | Generación de spec desde JSDoc |
 | `swagger-ui-express` | 5.0.1 | Interfaz web de Swagger |
 
 ### Desarrollo
-| Paquete | Versión | Uso |
+| Paquete   | Versión   | Uso |
 |---|---|---|
-| `nodemon` | 3.1.14 | Recarga automática del servidor |
+| `nodemon` | 3.1.14    | Recarga automática del servidor |
 
 ## Scripts disponibles
 
-| Script | Comando | Descripción |
+| Script    | Comando               | Descripción |
 |---|---|---|
-| `dev` | `nodemon src/index.js` | Arranca el servidor en modo desarrollo con recarga automática |
+| `dev`     | `nodemon src/index.js` | Arranca el servidor en modo desarrollo con recarga automática |
